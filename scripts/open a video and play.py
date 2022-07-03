@@ -9,7 +9,7 @@ import time
 
 geckodriver_autoinstaller.install()
 # driver = webdriver.Firefox()
-
+c
 firefox_profile = webdriver.FirefoxProfile()
 
 # allow video autoplay
@@ -19,7 +19,7 @@ driver = webdriver.Firefox(firefox_profile=firefox_profile)
 
 wait = WebDriverWait(driver, 10)
 
-playButtonXpath = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-watch-flexy/div[5]/div[1]/div/div[1]/div/div/div/ytd-player/div/div/div[26]/div[2]/div[1]/button'
+playButtonXpath = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-watch-flexy/div[5]/div[1]/div/div[1]/div/div/div/ytd-player/div/div/div[26]/div[2]/div[1]/button/svg'
 videoUrl = 'https://www.youtube.com/watch?v=sFS0vmV54vY'
 videoLengthInSeconds = 30
 
@@ -27,7 +27,12 @@ driver.get(videoUrl)
 time.sleep(10 + (random() * 10))
 # wait.until(EC.presence_of_element_located((By.XPATH, playButtonXpath)))
 
+count = 1
+
 while True:
+
+    count = count + 1
+    print("count", count)
 
     playButton = driver.find_element(By.XPATH, playButtonXpath)
     # try:

@@ -3,13 +3,11 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-import geckodriver_autoinstaller
 import time
-
 from selenium.webdriver.firefox.options import Options
 
-
-geckodriver_autoinstaller.install()
+# import geckodriver_autoinstaller
+# geckodriver_autoinstaller.install() # on mac m1 it doesnt instal correct arch
 
 # allow video autoplay
 
@@ -35,7 +33,7 @@ videoUrls = [
     'https://www.youtube.com/watch?v=GlUB1Xpd7jA&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=11'
 ]
 videoLengthInSeconds = 30
-
+gekodriverPath = "/Users/malik/geckodriver 2"
 
 
 count = 0
@@ -48,7 +46,7 @@ while True:
 
 
     print("opening browser...", int(round(time.time() * 1000)) - startTime)
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(executable_path=gekodriverPath)
 
     print("getting webpage...", int(round(time.time() * 1000)) - startTime)
 

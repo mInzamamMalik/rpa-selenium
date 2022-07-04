@@ -38,7 +38,7 @@ videoUrls = [
 ]
 videoLengthInSeconds = 162
 gekodriverPath = "/Users/malik/geckodriver 2"
-numberOfThreads = 15
+numberOfThreads = 20
 
 
 def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPath):
@@ -48,7 +48,7 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
         cpuLoadInPercent = int(psutil.cpu_percent())
         print("CPU Load: ", cpuLoadInPercent, "%")
         
-        # if cpu is high keep waiting for it to go below 90 before opening new browser window
+        # if cpu is high keep waiting for it to go below 80 before opening new browser window
         if(cpuLoadInPercent > 80):
             print(
                 "waiting for cpu to go below 80 ++++++++++++++++++++++++++++++++++++++++++++++")
@@ -68,7 +68,7 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
         print("random wait before getting the url... ",
               int(round(time.time())) - startTime)
         # important randomize because if not, it make a brust of get request on youtube that is detectable, it also gives little relief to the processor
-        time.sleep(1 + (random() * numberOfThreads))
+        # time.sleep(1 + (random() * numberOfThreads)) # looks unnececerry since I have added random wait before each thread starts
 
         print("getting webpage...", int(round(time.time())) - startTime)
         driver.get(url)
@@ -112,5 +112,6 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
 
 
 for i in range(0, numberOfThreads):
+    time.sleep(5 + (random() * 30)) # wait for 5 to 60 seconds before staring new thread, to avoide sudden processor load on script starting
     threading.Thread(target=oneView, args=(playButtonCssSelector, videoUrls,
                                            videoLengthInSeconds, gekodriverPath)).start()

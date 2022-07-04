@@ -7,6 +7,8 @@ import time
 from selenium.webdriver.firefox.options import Options
 from multiprocessing import Process
 import threading
+import psutil  # processor stats
+
 
 # import geckodriver_autoinstaller
 # geckodriver_autoinstaller.install() # on mac m1 it doesnt instal correct arch
@@ -42,6 +44,17 @@ numberOfThreads = 15
 def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPath):
     count = 0
     while True:
+
+        cpuLoadInPercent = int(psutil.cpu_percent())
+        print("CPU Load: ", cpuLoadInPercent, "%")
+        
+        # if cpu is high keep waiting for it to go below 90 before opening new browser window
+        if(cpuLoadInPercent > 80):
+            print(
+                "waiting for cpu to go below 80 ++++++++++++++++++++++++++++++++++++++++++++++")
+            time.sleep(10)
+            continue
+
         count = count + 1
         startTime = int(round(time.time()))
         print("count ===============> ", count)

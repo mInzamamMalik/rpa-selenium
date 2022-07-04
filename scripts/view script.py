@@ -5,6 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.firefox.options import Options
+from multiprocessing import Process
+import threading 
 
 # import geckodriver_autoinstaller
 # geckodriver_autoinstaller.install() # on mac m1 it doesnt instal correct arch
@@ -32,53 +34,62 @@ videoUrls = [
     'https://www.youtube.com/watch?v=nWGV6TSKA9U&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=10',
     'https://www.youtube.com/watch?v=GlUB1Xpd7jA&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=11'
 ]
-videoLengthInSeconds = 30
+videoLengthInSeconds = 162
 gekodriverPath = "/Users/malik/geckodriver 2"
+numberOfThreads = 20
 
 
-count = 0
-#  get system time in miliseconds
+def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPath):
+    count = 0
+    while True:
+        count = count + 1
+        startTime = int(round(time.time()))
+        print("count ===============> ", count)
 
-while True:
-    startTime = int(round(time.time() * 1000))
-    count = count + 1
-    print("count ===============> ", count)
+        print("opening browser...", int(round(time.time())) - startTime)
+        driver = webdriver.Firefox(executable_path=gekodriverPath)
 
+        url = videoUrls[int(random() * len(videoUrls))]
+        print("url:", url)
 
-    print("opening browser...", int(round(time.time() * 1000)) - startTime)
-    driver = webdriver.Firefox(executable_path=gekodriverPath)
+        print("getting webpage...", int(round(time.time())) - startTime)
+        driver.get(url)
 
-    print("getting webpage...", int(round(time.time() * 1000)) - startTime)
+        print("waiting for webpage to load...", int(
+            round(time.time())) - startTime)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, playButtonCssSelector)))
 
+        playButton = driver.find_element(
+            By.CSS_SELECTOR, playButtonCssSelector)
+        print("playButton", playButton, int(
+            round(time.time())) - startTime)
 
-    url = videoUrls[  int(random() * len(videoUrls))  ];
-    print("url:", url)
-    driver.get(url)
+        print("random wait before click on play button",
+              int(round(time.time())) - startTime)
+        time.sleep(1 + (random() * 6))  # important randomize
 
-    print("waiting for webpage to load...", int(round(time.time() * 1000)) - startTime)
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located(
-            (By.CSS_SELECTOR, playButtonCssSelector)))
+        print("click", int(round(time.time())) - startTime)
+        playButton.click()
 
+        playStartTime = int(round(time.time()))
 
-    playButton = driver.find_element(By.CSS_SELECTOR, playButtonCssSelector)
-    print("playButton", playButton, int(round(time.time() * 1000)) - startTime)
+        print("playing video for random duration...",
+              int(round(time.time())) - startTime)
+        # important randomize
+        time.sleep(6 + (random() * videoLengthInSeconds))
 
-    print("random wait before click on play button", int(round(time.time() * 1000)) - startTime)
-    time.sleep(1+ (random() * 6)) # important randomize
-    
-    print("click", int(round(time.time() * 1000)) - startTime)
-    playButton.click()
+        # driver.refresh()
+        # WebDriverWait(driver, 10).until(
+        #     EC.presence_of_element_located(
+        #         (By.CSS_SELECTOR, playButtonCssSelector)))
+        print("video played for: ", int(round(time.time())) - playStartTime)
+        print("closing browser...", int(round(time.time())) - startTime)
+        driver.quit()
 
-    print("playing video for random duration...", int(round(time.time() * 1000)) - startTime)
-    time.sleep(6 + (random() * videoLengthInSeconds)) # important randomize
+        print("took: ", int(round(time.time())) - startTime)
 
-    # driver.refresh()
-    # WebDriverWait(driver, 10).until(
-    #     EC.presence_of_element_located(
-    #         (By.CSS_SELECTOR, playButtonCssSelector)))
-
-    print("closing browser...", int(round(time.time() * 1000)) - startTime)
-    driver.quit()
-
-    print ("took: ", int(round(time.time() * 1000)) - startTime); 
+for i in range(0, numberOfThreads):
+    threading.Thread(target=oneView, args=(playButtonCssSelector, videoUrls,
+        videoLengthInSeconds, gekodriverPath)).start()

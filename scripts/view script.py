@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.firefox.options import Options
 from multiprocessing import Process
-import threading 
+import threading
 
 # import geckodriver_autoinstaller
 # geckodriver_autoinstaller.install() # on mac m1 it doesnt instal correct arch
@@ -36,7 +36,7 @@ videoUrls = [
 ]
 videoLengthInSeconds = 162
 gekodriverPath = "/Users/malik/geckodriver 2"
-numberOfThreads = 20
+numberOfThreads = 15
 
 
 def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPath):
@@ -51,6 +51,11 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
 
         url = videoUrls[int(random() * len(videoUrls))]
         print("url:", url)
+
+        print("random wait before getting the url... ",
+              int(round(time.time())) - startTime)
+        # important randomize because if not, it make a brust of get request on youtube that is detectable, it also gives little relief to the processor
+        time.sleep(1 + (random() * numberOfThreads))
 
         print("getting webpage...", int(round(time.time())) - startTime)
         driver.get(url)
@@ -75,10 +80,12 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
 
         playStartTime = int(round(time.time()))
 
-        print("playing video for random duration...",
+        # from 50% to 100% of video length
+        randomDuration = (videoLengthInSeconds/2) + \
+            ((random() * videoLengthInSeconds) / 2)
+        print("playing video for random duration of ", randomDuration, "sec  ",
               int(round(time.time())) - startTime)
-        # important randomize
-        time.sleep(6 + (random() * videoLengthInSeconds))
+        time.sleep(randomDuration)  # important randomize
 
         # driver.refresh()
         # WebDriverWait(driver, 10).until(
@@ -90,6 +97,7 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
 
         print("took: ", int(round(time.time())) - startTime)
 
+
 for i in range(0, numberOfThreads):
     threading.Thread(target=oneView, args=(playButtonCssSelector, videoUrls,
-        videoLengthInSeconds, gekodriverPath)).start()
+                                           videoLengthInSeconds, gekodriverPath)).start()

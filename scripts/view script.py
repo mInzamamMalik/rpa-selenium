@@ -24,30 +24,35 @@ import psutil  # processor stats
 playButtonCssSelector = "#movie_player > .ytp-chrome-bottom > .ytp-chrome-controls > .ytp-left-controls > .ytp-play-button "
 playButtonXpath = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-watch-flexy/div[5]/div[1]/div/div[1]/div/div/div/ytd-player/div/div/div[26]/div[2]/div[1]/button'
 videoUrls = [
-    'https://www.youtube.com/watch?v=zA1ck3sVL2s&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=1',
-    'https://www.youtube.com/watch?v=aWEmLUvrgGc&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=2',
-    'https://www.youtube.com/watch?v=PjztvPrrn4Y&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=3',
-    'https://www.youtube.com/watch?v=vVfmwVn2U_o&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=4',
-    'https://www.youtube.com/watch?v=ARgAHpLq8tg&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=5',
-    'https://www.youtube.com/watch?v=DyoCBEeFaOs&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=6',
-    'https://www.youtube.com/watch?v=stiPGLXIQEg&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=7',
-    'https://www.youtube.com/watch?v=8vdSIs_2ziw&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=8',
-    'https://www.youtube.com/watch?v=LAIxGoyYoU4&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=9',
-    'https://www.youtube.com/watch?v=nWGV6TSKA9U&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=10',
-    'https://www.youtube.com/watch?v=GlUB1Xpd7jA&list=PLOGD79Ikh_BZRVqzegRzgQVX_kwS8YlcZ&index=11'
+    {
+        link: 'https://www.youtube.com/watch?v=y1c2Jy19P18&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=3',
+        durationInMinutes: 10
+    },
+    {
+        link: 'https://www.youtube.com/watch?v=pHsiCotGxJ0&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=5',
+        durationInMinutes: 10
+    },
+    {
+        link: 'https://youtu.be/yHrko6opl_k?fbclid=IwAR3MSCbtTCtLLrNypHcXGkr8ssDxZRYqyRN9lZrEMJG4St2RyUlBW7y5JwQ',
+        durationInMinutes: 103
+    },
+    {
+        link: 'https://youtu.be/DovNUotK6D8?fbclid=IwAR1ObLpifxHkSwZAjKzF9gI2jDJu0pKiWEfNpZfkfHSXfDt5y8d84KQuqYc',
+        durationInMinutes: 78
+    },
 ]
-videoLengthInSeconds = 162
+
 gekodriverPath = "/Users/malik/geckodriver 2"
 numberOfThreads = 20
 
 
-def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPath):
+def oneView(playButtonCssSelector, videoUrls, gekodriverPath):
     count = 0
     while True:
 
         cpuLoadInPercent = int(psutil.cpu_percent())
         print("CPU Load: ", cpuLoadInPercent, "%")
-        
+
         # if cpu is high keep waiting for it to go below 80 before opening new browser window
         if(cpuLoadInPercent > 80):
             print(
@@ -62,7 +67,8 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
         print("opening browser...", int(round(time.time())) - startTime)
         driver = webdriver.Firefox(executable_path=gekodriverPath)
 
-        url = videoUrls[int(random() * len(videoUrls))]
+        randomVideoIndex = int(random() * len(videoUrls))
+        url = videoUrls[randomVideoIndex].link
         print("url:", url)
 
         print("random wait before getting the url... ",
@@ -94,16 +100,13 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
         playStartTime = int(round(time.time()))
 
         # from 50% to 100% of video length
+        videoLengthInSeconds = videos[randomVideoIndex].durationInMinutes * 60
         randomDuration = (videoLengthInSeconds/2) + \
             ((random() * videoLengthInSeconds) / 2)
         print("playing video for random duration of ", randomDuration, "sec  ",
               int(round(time.time())) - startTime)
         time.sleep(randomDuration)  # important randomize
 
-        # driver.refresh()
-        # WebDriverWait(driver, 10).until(
-        #     EC.presence_of_element_located(
-        #         (By.CSS_SELECTOR, playButtonCssSelector)))
         print("video played for: ", int(round(time.time())) - playStartTime)
         print("closing browser...", int(round(time.time())) - startTime)
         driver.quit()
@@ -112,6 +115,7 @@ def oneView(playButtonCssSelector, videoUrls, videoLengthInSeconds, gekodriverPa
 
 
 for i in range(0, numberOfThreads):
-    time.sleep(5 + (random() * 30)) # wait for 5 to 60 seconds before staring new thread, to avoide sudden processor load on script starting
+    # wait for 5 to 60 seconds before staring new thread, to avoide sudden processor load on script starting
+    time.sleep(5 + (random() * 30))
     threading.Thread(target=oneView, args=(playButtonCssSelector, videoUrls,
-                                           videoLengthInSeconds, gekodriverPath)).start()
+                                           gekodriverPath)).start()

@@ -25,20 +25,20 @@ playButtonCssSelector = "#movie_player > .ytp-chrome-bottom > .ytp-chrome-contro
 playButtonXpath = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-watch-flexy/div[5]/div[1]/div/div[1]/div/div/div/ytd-player/div/div/div[26]/div[2]/div[1]/button'
 videoUrls = [
     {
-        link: 'https://www.youtube.com/watch?v=y1c2Jy19P18&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=3',
-        durationInMinutes: 10
+        "link": 'https://www.youtube.com/watch?v=y1c2Jy19P18&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=3',
+        "durationInMinutes": 10
     },
     {
-        link: 'https://www.youtube.com/watch?v=pHsiCotGxJ0&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=5',
-        durationInMinutes: 10
+        "link": 'https://www.youtube.com/watch?v=pHsiCotGxJ0&list=PLaZSdijfCCJBMZM40_pDElJ8dZfQIIreF&index=5',
+        "durationInMinutes": 10
     },
     {
-        link: 'https://youtu.be/yHrko6opl_k?fbclid=IwAR3MSCbtTCtLLrNypHcXGkr8ssDxZRYqyRN9lZrEMJG4St2RyUlBW7y5JwQ',
-        durationInMinutes: 103
+        "link": 'https://youtu.be/yHrko6opl_k?fbclid=IwAR3MSCbtTCtLLrNypHcXGkr8ssDxZRYqyRN9lZrEMJG4St2RyUlBW7y5JwQ',
+        "durationInMinutes": 103
     },
     {
-        link: 'https://youtu.be/DovNUotK6D8?fbclid=IwAR1ObLpifxHkSwZAjKzF9gI2jDJu0pKiWEfNpZfkfHSXfDt5y8d84KQuqYc',
-        durationInMinutes: 78
+        "link": 'https://youtu.be/DovNUotK6D8?fbclid=IwAR1ObLpifxHkSwZAjKzF9gI2jDJu0pKiWEfNpZfkfHSXfDt5y8d84KQuqYc',
+        "durationInMinutes": 78
     },
 ]
 
@@ -52,11 +52,20 @@ def oneView(playButtonCssSelector, videoUrls, gekodriverPath):
 
         cpuLoadInPercent = int(psutil.cpu_percent())
         print("CPU Load: ", cpuLoadInPercent, "%")
+        ramUsedPercent = psutil.virtual_memory().percent
+        print("Ram load: ", ramUsedPercent, "%")
 
         # if cpu is high keep waiting for it to go below 80 before opening new browser window
         if(cpuLoadInPercent > 80):
             print(
                 "waiting for cpu to go below 80 ++++++++++++++++++++++++++++++++++++++++++++++")
+            time.sleep(10)
+            continue
+
+        # if cpu is high keep waiting for it to go below 80 before opening new browser window
+        if(ramUsedPercent > 90):
+            print(
+                "waiting for ram to go below 90 ++++++++++++++++++++++++++++++++++++++++++++++")
             time.sleep(10)
             continue
 
@@ -68,7 +77,7 @@ def oneView(playButtonCssSelector, videoUrls, gekodriverPath):
         driver = webdriver.Firefox(executable_path=gekodriverPath)
 
         randomVideoIndex = int(random() * len(videoUrls))
-        url = videoUrls[randomVideoIndex].link
+        url = videoUrls[randomVideoIndex]["link"]
         print("url:", url)
 
         print("random wait before getting the url... ",
@@ -100,7 +109,7 @@ def oneView(playButtonCssSelector, videoUrls, gekodriverPath):
         playStartTime = int(round(time.time()))
 
         # from 50% to 100% of video length
-        videoLengthInSeconds = videos[randomVideoIndex].durationInMinutes * 60
+        videoLengthInSeconds = videoUrls[randomVideoIndex]["durationInMinutes"] * 60
         randomDuration = (videoLengthInSeconds/2) + \
             ((random() * videoLengthInSeconds) / 2)
         print("playing video for random duration of ", randomDuration, "sec  ",
@@ -116,6 +125,6 @@ def oneView(playButtonCssSelector, videoUrls, gekodriverPath):
 
 for i in range(0, numberOfThreads):
     # wait for 5 to 60 seconds before staring new thread, to avoide sudden processor load on script starting
-    time.sleep(5 + (random() * 30))
     threading.Thread(target=oneView, args=(playButtonCssSelector, videoUrls,
                                            gekodriverPath)).start()
+    time.sleep(5 + (random() * 30))
